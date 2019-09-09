@@ -3,7 +3,7 @@
 # ~~~~~==============   HOW TO RUN   ==============~~~~~
 # 1) Configure things in CONFIGURATION section
 # 2) Change permissions: chmod +x bot.py
-# 3) Run in loop: while true ; do ./sample-bot2.py ; sleep 1; done
+# 3) Run in loop: while true ; do ./sample-bot3.py ; sleep 1; done
 
 from __future__ import print_function
 
@@ -47,10 +47,11 @@ def read_from_exchange(exchange):
 
 def trade_bonds(exchange, order_id):
     write_to_exchange(exchange, {"type": "add", "order_id": order_id, "symbol":"BOND", "dir": "BUY", "price": 999, "size": 10 })
-    #time.sleep(.01)
+    time.sleep(.01)
     order_id += 1
+
     write_to_exchange(exchange, {"type": "add", "order_id": order_id, "symbol":"BOND", "dir": "SELL", "price": 1001, "size": 10 })
-    #time.sleep(.01)
+    ttime.sleep(.01)
 
 def sell_bonds(exchange, order_id):
        write_to_exchange(exchange, {"type": "add", "order_id": order_id, "symbol":"BOND", "dir": "SELL", "price": 1001, "size": 10 })
@@ -61,6 +62,49 @@ def buy_bonds(exchange, order_id):
        write_to_exchange(exchange, {"type": "add", "order_id": order_id, "symbol":"BOND", "dir": "BUY", "price": 999, "size": 10 })
        order_id += 1
        #time.sleep(.01)
+
+def get_fair_value(res, symbol):
+    max_bid = 0
+    min_offer = 999999999999999999
+    bids = res['buy']
+    offers = res['sell']
+
+    for bid in bids:
+        bid_val = bid[0]
+        max_bid = max(max_bid, bid_val)
+        
+    for offer in offers:
+        offer_val = offer[0]
+        min_offer = min(min_offer, offer_val)
+
+    print("MAX BID:", max_bid)
+    print("MIN OFFER:", min_offer)
+
+    return (max_bid+min_offer)/2
+
+def get_spread(res, symbol):
+    max_bid = 0
+    min_offer = 999999999999999999
+    bids = res['buy']
+    offers = res['sell']
+
+     for bid in bids:
+        bid_val = bid[0]
+        max_bid = max(max_bid, bid_val)
+        
+    for offer in offers:
+        offer_val = offer[0]
+        min_offer = min(min_offer, offer_val)
+
+    print("MAX BID:", max_bid)
+    print("MIN OFFER:", min_offer)
+
+    return min_offer-max_bid
+
+def adr(exchange, order_id, fair_value, spread):
+    pass
+
+
 
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
@@ -82,43 +126,22 @@ def main():
     DIR_SELL = 'sell'
     DIR_BUY = 'buy'
 
-    # b = 0
-    # s = 0
-    # t = 0
-
     while True:
         res = read_from_exchange(exchange)
 
-        #print(res)
-
         if DIR_SELL in res:
-            # print(res)
-            # print(res[DIR_SELL])
-            # print('-----', res[DIR_SELL][0])
             if len(res[DIR_SELL]) > 0 and res[DIR_SELL][0][0] > INITIAL_PRICE:
-                #print('Buying...')
-                #b += 1
                 buy_bonds(exchange, order_id)
                 order_id += 1
 
         if DIR_BUY in res:
             if len(res[DIR_BUY]) > 0 and res[DIR_BUY][0][0] < INITIAL_PRICE:
-                #print('Selling...')
-                #s += 1
                 sell_bonds(exchange, order_id)
                 order_id += 1
 
         elif random.random() < 0.5:
-            #print('Trading...')
-            #t += 1
             trade_bonds(exchange, order_id)
             order_id += 2
-
-        # print('STATS:')
-        # print('b', b)
-        # print('s', s)
-        # print('t', t)
-        
      
 
 if __name__ == "__main__":

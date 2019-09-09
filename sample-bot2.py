@@ -82,44 +82,22 @@ def main():
     DIR_SELL = 'sell'
     DIR_BUY = 'buy'
 
-    # b = 0
-    # s = 0
-    # t = 0
-
     while True:
         res = read_from_exchange(exchange)
 
-        #print(res)
-
         if DIR_SELL in res:
-            # print(res)
-            # print(res[DIR_SELL])
-            # print('-----', res[DIR_SELL][0])
             if len(res[DIR_SELL]) > 0 and res[DIR_SELL][0][0] > INITIAL_PRICE:
-                #print('Buying...')
-                #b += 1
                 buy_bonds(exchange, order_id)
                 order_id += 1
 
         if DIR_BUY in res:
             if len(res[DIR_BUY]) > 0 and res[DIR_BUY][0][0] < INITIAL_PRICE:
-                #print('Selling...')
-                #s += 1
                 sell_bonds(exchange, order_id)
                 order_id += 1
 
         elif random.random() < 0.5:
-            #print('Trading...')
-            #t += 1
             trade_bonds(exchange, order_id)
             order_id += 2
-
-        # print('STATS:')
-        # print('b', b)
-        # print('s', s)
-        # print('t', t)
-        
-     
 
 if __name__ == "__main__":
     main()
