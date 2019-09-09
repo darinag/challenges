@@ -52,6 +52,14 @@ def trade_bonds(exchange, order_id):
     write_to_exchange(exchange, {"type": "add", "order_id": order_id, "symbol":"BOND", "dir": "SELL", "price": 1001, "size": 10 })
     #time.sleep(.01)
 
+def sell_bonds(exchange, order_id):
+       write_to_exchange(exchange, {"type": "add", "order_id": order_id, "symbol":"BOND", "dir": "SELL", "price": 1001, "size": 10 })
+       order_id += 1
+
+def buy_bonds(exchange, order_id):
+       write_to_exchange(exchange, {"type": "add", "order_id": order_id, "symbol":"BOND", "dir": "BUY", "price": 999, "size": 10 })
+       order_id += 1
+
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -68,15 +76,43 @@ def main():
     # -------------------------------------------------------------------
 
     order_id = 0
+    INITIAL_PRICE = 1000
+    DIR_SELL = 'sell'
+    DIR_BUY = 'buy'
+
+    b = 0
+    s = 0
+    t = 0
 
     while True:
         res = read_from_exchange(exchange)
+
         print(res)
-        print()
-        if random.random() < 0.5:
+
+        if DIR_SELL in res:
+            if res[DIR_SELL][0][0] > INITIAL_PRICE:
+                print('Buying...')
+                b += 1
+                buy_bonds(exchange, order_id)
+                order_id += 1
+
+        elif DIR_BUY in res:
+            if res[DIR_BUY][0][0] < INITIAL_PRICE:
+                print('Selling...')
+                s += 1
+                sell_bonds(exchange, order_id)
+                order_id += 1
+
+        elif random.random() < 0.5:
+            print('Trading...')
+            t += 1
             trade_bonds(exchange, order_id)
             order_id += 2
 
+        print('STATS:')
+        print('b', b)
+        print('s', s)
+        print('t', t)
         
      
 

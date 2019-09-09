@@ -71,8 +71,6 @@ def main():
 
     while True:
         res = read_from_exchange(exchange)
-
-        print('yes')
      
         if random.random() < 0.5:
             trade_bonds(exchange, order_id)
