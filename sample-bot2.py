@@ -71,12 +71,13 @@ def main():
 
     while True:
         res = read_from_exchange(exchange)
-
-        print('yes')
-     
+        print(res)
+        print()
         if random.random() < 0.5:
             trade_bonds(exchange, order_id)
             order_id += 2
+
+        
      
 
 if __name__ == "__main__":
